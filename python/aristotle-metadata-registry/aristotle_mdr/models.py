@@ -650,8 +650,8 @@ class _concept(baseAristotleObject):
         help_text=_("Descriptive comments about the metadata item (8.1.2.2.3.4)"),
         blank=True
     )
-    submitting_organisation = models.CharField(max_length=256, blank=True)
-    responsible_organisation = models.CharField(max_length=256, blank=True)
+    submitting_organisation = ShortTextField(blank=True)
+    responsible_organisation = ShortTextField(blank=True)
 
     superseded_by = ConceptForeignKey(
         'self',

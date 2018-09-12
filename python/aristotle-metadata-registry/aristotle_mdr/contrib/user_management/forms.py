@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 
 from aristotle_mdr.forms.utils import FormRequestMixin
 from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.fields import LowerEmailFormField
 
 from organizations.backends.forms import UserRegistrationForm
 
@@ -23,6 +24,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
         errors = []
         for i, email in enumerate(emails):
+            email = email.lower()
             if email.strip() == "":
                 continue
             try:
@@ -35,7 +37,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
         if errors:
             raise ValidationError(errors)
 
-        emails = [e.strip() for e in data.split('\n') if e != ""]
+        emails = [e.strip().lower() for e in data.split('\n') if e != ""]
         self.cleaned_data['email_list'] = "\n".join(emails)
 
         self.emails = emails
@@ -43,7 +45,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
 class ResendActivationForm(forms.Form):
 
-    email = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = LowerEmailFormField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -56,7 +58,7 @@ class UserRegistrationForm(forms.ModelForm):
         max_length=128,
         widget=forms.PasswordInput
     )
-    email = forms.EmailField(
+    email = LowerEmailFormField(
         max_length=254
     )
 

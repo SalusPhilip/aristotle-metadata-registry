@@ -139,7 +139,6 @@ class SignupMixin:
     def send_password_reset(self, user_email, request):
 
         form = PasswordResetForm({'email': user_email})
-
         if form.is_valid():
             form.save(
                 request=request,

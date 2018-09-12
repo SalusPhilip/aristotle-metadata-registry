@@ -23,8 +23,10 @@ from django.db.models import (
     OneToOneField, OneToOneRel
 )
 from django.db.models.fields import (
-    TextField
+    TextField, EmailField
 )
+
+from django.forms import EmailField as EmailFormField
 
 from constrainedfilefield.fields import ConstrainedImageField
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -114,3 +116,31 @@ class ConvertedConstrainedImageField(ConstrainedImageField):
         )
 
         return imagefile
+
+
+class LowerEmailFormField(EmailFormField):
+
+    def clean(self, value):
+        if value is not None:
+            value = value.lower()
+        return super().clean(value)
+
+
+class LowerEmailField(EmailField):
+    """
+    Reimplementation of email field, where email is always stored lowercase
+    """
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super().get_db_prep_value(value, connection, prepared)
+        if value is not None:
+            return value.lower()
+        else:
+            return value
+
+    def formfield(self, *args, **kwargs):
+        defaults = {
+            'form_class': LowerEmailFormField
+        }
+        defaults.update(kwargs)
+        return super().formfield(**defaults)

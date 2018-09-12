@@ -1,5 +1,5 @@
 from django.forms.models import ModelMultipleChoiceField
-import aristotle_mdr.models as MDR
+from aristotle_mdr.models import STATES, Status
 from aristotle_mdr.utils import status_filter
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 from django.urls import reverse
@@ -48,14 +48,14 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
-        statuses = MDR.Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
+        statuses = Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
         statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
         # Build a dict mapping concepts to their status data
         # So that no additional status queries need to be made
         states_dict = {}
         for status in statuses:
-            state_name = str(MDR.STATES[status.state])
+            state_name = str(STATES[status.state])
             reg_date = status.registrationDate
             if status.concept.id not in states_dict:
                 states_dict[status.concept.id] = {'name': state_name, 'reg_date': reg_date}
